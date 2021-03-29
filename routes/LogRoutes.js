@@ -16,6 +16,6 @@ router.post('/login', login);
 //register
 router.post('/register', register);
 //forget
-router.post('/forget', forget);
+router.post('/forget/:email', forget);
 
 module.exports = router;

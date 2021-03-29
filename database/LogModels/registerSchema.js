@@ -4,20 +4,17 @@ const registerSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        match: /.+\@.+\..+/,
+        unique: true,
     },
     username: {
         type: String,
         required: true,
         minlength: 4,
         maxlength: 32,
+        unique: true,
     },
-    password1: {
-        type: String,
-        required: true,
-        minlength: 8,
-        maxlength: 32,
-    },
-    password2: {
+    password: {
         type: String,
         required: true,
         minlength: 8,
@@ -26,7 +23,7 @@ const registerSchema = new mongoose.Schema({
 
 });
 
-const registerModel = mongoose.model('newUsers', registerSchema);
+const registerModel = mongoose.model('user', registerSchema);
 
 module.exports = registerModel;
 

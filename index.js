@@ -1,7 +1,8 @@
 const express = require('express');
-const app = express();
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 const cors = require('cors');
+
+const app = express();
 
 const {port} = require('./config/serverConfig');
 const apiLogin = require('./routes/LogRoutes');
@@ -9,14 +10,15 @@ const apiLogin = require('./routes/LogRoutes');
 //init database
 require('./database/mongoose');
 
-// routes
-app.use('/', apiLogin);
-
 //parser
 app.use(bodyParser.json());
 
 //fix cors
 app.use(cors());
+
+// routes
+app.use('/auth', apiLogin);
+
 
 // server
 app.listen(port, () => {
