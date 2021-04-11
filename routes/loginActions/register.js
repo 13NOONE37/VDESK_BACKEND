@@ -1,37 +1,33 @@
-const registerModel = require('../../database/LogModels/registerSchema');
-const hashPassword = require('../loginActions/hashPassword');
+const bcrypt = require('bcrypt');
 
 module.exports = async (req, res)=>{
-    
-     const email = req.body.email;
-     const username = req.body.username; 
-     let password = req.body.password;
-
     try{
-        //checking length of password
-            if(password.length<8) return res.status(200).send("Password is too short");
-            if( password.length>32) return res.status(200).send("Password is too long");
+        const body = req.body;
+
+        //validation
+        if(!(body.username) || !(body.email) || body.password.length<8 || body.password.length>32) return res.status(400).send("Data not formatted properly");
 
         //checking does user already exists
         let isCreated=false;
         let result;
 
-            result = await registerModel.find({email:email});
-            if(result.length!=0) isCreated=true;
+            result = await registerModel.findOne({email:body.email});
+            if(result) isCreated=true;
 
-            result = await registerModel.find({username:username});
-            if(result.length!=0) isCreated=true;
+            result = await registerModel.findOne({username:body.username});
+            if(result) isCreated=true;
 
             if(isCreated) return res.status(200).send("Account already exist");
 
-        //hash password
-          password = await hashPassword(password); //sama funkcja jest asychroniczna wiec zwraca promisa dlatego tutaj tez nalzy uzyc await
+        //gen salt
+        const salt = await bcrypt.genSalt(4);
         
-        //add new user
-        const temp = new registerModel({email, username, password});
-             console.log(temp);//delete 
-            await temp.save();
-             res.status(201).send("Saved succesfuly");
+        //add user
+        const user = new registerModel(body);
+
+        user.password = await bcrypt.hash(body.password, salt);
+        user.save().then((doc) => res.status(201).send("Account created"));
+
     } catch(err) {
         return res.status(422).json({message: err.message});
     }

@@ -1,25 +1,18 @@
 const { json } = require('body-parser');
 const registerModel = require('../../database/LogModels/registerSchema');
-const comparePassword = require('../loginActions/comparePassword');
-const hashPassword = require('../loginActions/hashPassword');
+const bcrypt = require('bcrypt');
 
 module.exports = async (req, res)=>{
-     
-    try{
-        const result = await registerModel.find({email: req.body.email});
 
-        if(result.length!=0) {
-            const correct = await comparePassword(req.body.password, result[0].password);
+        const body = req.body;
+        const user = await registerModel.findOne({email: body.email});
 
-            if(correct) return res.status(200).send("Logged succesful"); 
-        }
+        if(user) {
+            const isValid = await bcrypt.compare(body.password, user.password);
 
-        
-        res.status(201).send("Data uncorrected"); //zmienic na odpowiedni kod chyba zeby w reacie zdecydowac czy zalogowano
-
-    } catch(err) {
-        return res.status(422).json({message: err.message});
-    }
+            if(isValid) return res.status(200).json({message:"Valid password"})
+            else return res.status(400).json({message:"Invalid password"})
+        } else 
+            res.status(401).json({error:"User does not exist"});
 
 };
-
