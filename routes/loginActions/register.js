@@ -1,3 +1,5 @@
+const { json } = require('body-parser');
+const registerModel = require('../../database/LogModels/registerSchema');
 const bcrypt = require('bcrypt');
 
 module.exports = async (req, res)=>{
