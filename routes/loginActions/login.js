@@ -11,8 +11,8 @@ module.exports = async (req, res)=>{
         if(user) {
             const isValid = await bcrypt.compare(body.password, user.password);
 
-            if(isValid) return res.status(200).json({message:"Valid password"})
-            else return res.status(400).json({message:"Invalid password"})
+            if(isValid) return res.status(200).json({isValid:true})
+            else return res.status(400).json({isValid:false})
         } else 
             res.status(401).json({error:"User does not exist"});
 
