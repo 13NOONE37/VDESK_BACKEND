@@ -19,7 +19,7 @@ module.exports = async (req, res)=>{
             result = await registerModel.findOne({username:body.username});
             if(result) isCreated=true;
 
-            if(isCreated) return res.status(200).send("Account already exist");
+            if(isCreated) return res.status(200).json({created:false, message:'Account exist'});
 
         //gen salt
         const salt = await bcrypt.genSalt(4);
@@ -28,10 +28,10 @@ module.exports = async (req, res)=>{
         const user = new registerModel(body);
 
         user.password = await bcrypt.hash(body.password, salt);
-        user.save().then((doc) => res.status(201).send("Account created"));
+        user.save().then((doc) => res.status(201).json({created:true, message:'Created sucessful'}));
 
     } catch(err) {
-        return res.status(422).json({message: err.message});
+        return res.status(422).json({created:false, message:'Something went wrong'});
     }
 };
 
